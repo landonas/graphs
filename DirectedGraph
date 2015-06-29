@@ -1,0 +1,408 @@
+package ics311;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
+/************************************************************************************
+ * 
+ * @author Landon Soriano
+ * 
+ *         This class contains the implementation for a Directed Graph ADT. This
+ *         implementation uses ArrayLists to hold the vertices and arcs.
+ *         
+ ************************************************************************************/
+public class DirectedGraph {
+	private ArrayList<Vertex> vertex;
+	private ArrayList<Arc> arcs;
+
+	/*
+	 * Default constructor. Initializes the two ArrayLists
+	 */
+	public DirectedGraph() {
+		vertex = new ArrayList<Vertex>();
+		arcs = new ArrayList<Arc>();
+	}
+
+	//accessors 
+
+	/*
+	 * Returns the number of vertices in the Graph
+	 */
+	public int numVertices() {
+		return vertex.size();
+	}
+	
+	/*
+	 * Returns the number of arcs in the Graph
+	 */
+	public int numArcs() {
+		return arcs.size();
+	}
+	
+	/*
+	 * Returns an Iterator of the vertices in the Graph
+	 */
+	public java.util.Iterator<Vertex> vertices() {
+		return vertex.iterator();
+	}
+
+    //Returns TRUE if there exists a vertex under key; otherwise FALSE.
+	public Boolean vertexExists(Vertex v){
+		if(vertex.get(1) != null){
+			return true;
+		}
+		else{
+		return false;
+		}
+
+		
+	}
+	
+	
+    //Returns TRUE if there exists an arc (key1, key2), otherwise FALSE.
+	public Boolean arcExists(Arc a, Arc b){
+		//return null;
+		if(arcs.get(1) != null && arcs.get(2) != null){
+			return true;
+		}
+		
+		else{
+		return false; 
+			
+		}
+	
+	}
+		
+	
+	
+	
+	/*
+	 * Returns an Iterator of the arcs in the Graph
+	 */
+	public java.util.Iterator<Arc> arcs() {
+		return arcs.iterator();
+	}
+	
+	
+	/*
+	 * Returns the in-degree of the given Vertex
+	 */
+	public int inDegree(Vertex v) {
+		return v.getInDegree();
+	}
+
+	/*
+	 * Returns the out-degree of the given Vertex
+	 */
+	public int outDegree(Vertex v) {
+		return v.getOutDegree();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+	/*
+	 * Returns the vertex identified by the given key, or null, if it is not in
+	 * the Graph
+	 */
+	public Vertex getVertexData(Object key) {
+		for (int i = 0; i < vertex.size(); i++) {
+			if (vertex.get(i).getKey().equals(key)) {
+				return vertex.get(i);
+			}
+		}
+
+		return null;
+	}
+
+	/*
+	 * Returns the Arc connecting the two vertices with the given keys (source
+	 * and target). 
+	 * 
+	 * Returns null if either key does not produce a vertex or no
+	 * appropriate arc is found
+	 * 
+	 * This method first checks that the two vertices exist, then looks through
+	 * the list of arcs to find a matching one.
+	 */
+	public Arc getArcData(Object source, Object target) {
+		Vertex from = (Vertex) source;
+		Vertex to = (Vertex) target;
+
+		for (int i = 0; i < arcs.size(); i++) {
+			if (arcs.get(i).getFrom().getKey().equals(from.getKey())
+					&& arcs.get(i).getTo().getKey().equals(to.getKey())) {
+				//matching arcs are discovered
+				return arcs.get(i);
+			}
+		}
+		//no matching arcs are found
+		return null;
+	}
+
+	
+
+	/*
+	 * Returns an Iterator of the vertices in-adjacent to the given Vertex
+	 */
+	public java.util.Iterator<Vertex> inAdjacentVerices(Vertex v) {
+		return v.getInAdjacencies();
+	}
+
+	/*
+	 * Returns an Iterator of the vertices out-adjacent to the given Vertex
+	 */
+	public java.util.Iterator<Vertex> outAdjacentVerices(Vertex v) {
+		return v.getOutAdjacencies();
+	}
+
+	
+
+	// Mutators  
+
+	/*
+	 * Adds and returns a new Vertex to the Graph with the given key and the
+	 * data set to null
+	 */
+	public Vertex insertVertex(Object key) {
+		Vertex toInsert;
+		toInsert = new Vertex(key, null);
+		vertex.add(toInsert);
+		return toInsert;
+	}
+
+	/*
+	 * Adds and returns a new Vertex to the Graphs with the given key and data
+	 */
+	public Vertex insertVertex(Object key, Object data) {
+		Vertex toInsert;
+		toInsert = new Vertex(key, data);
+		vertex.add(toInsert);
+		return toInsert;
+	}
+
+	/*
+	 * Adds and returns a new Arc in the Graph going from Vertex u to Vertex v,
+	 * with null data and a weight of 0
+	 */
+	public Arc insertArc(Vertex u, Vertex v) {
+		Arc toInsert;
+		toInsert = new Arc(null, u, v, 0);
+		u.setOutAdjacency(v);
+		v.setInAdjacency(u);
+		arcs.add(toInsert);
+		return toInsert;
+	}
+
+	/*
+	 * Adds and returns a new Arc in the Graph going from Vertex u to Vertex v,
+	 * with given data and weight of 0
+	 */
+	public Arc insertArc(Vertex u, Vertex v, Object data) {
+		Arc toInsert;
+		toInsert = new Arc(data, u, v, 0);
+		arcs.add(toInsert);
+		return toInsert;
+	}
+
+	/*
+	 * Sets the given Vertex's data to the given Object
+	 */
+	public void setVertexData(Vertex v, Object data) {
+		v.setData(data);
+	}
+
+	/*
+	 * Sets the given Arc's data to the given Object
+	 */
+	public void setArcData(Arc a, Arc b,  Object data) {
+		a.setData(data);
+	}
+
+	
+	/*
+	 * Changes the weight on arc (key1, key2) to w.
+	 * 
+	 */
+	public void setArcWeight(Arc a, Arc b, int weight){
+		a.setWeight(weight);
+			
+	}
+	
+	public void getArcWeight(Arc a, Arc b){
+		
+		
+		
+	}
+	
+	
+	/*
+	 * Removes the given Vertex. Removes it from the in/out-adjacency lists of
+	 * all it's adjacent vertices and removes all incident Arcs Returns the data
+	 * the was held in the Vertex
+	 */
+	public Object removeVertex(Vertex v) {
+		Object data = v.getData();
+
+		Iterator<Vertex> in = v.getInAdjacencies();
+		Iterator<Vertex> out = v.getOutAdjacencies();
+
+		while (in.hasNext()) // Removes v from in-adjacency list of each
+								// in-adjacent vertex
+		{
+			Vertex next = in.next();
+
+			next.removeInAdjacency(v);
+		}
+		while (out.hasNext()) // Removes v from out-adjacency list of each
+								// out-adjacent vertex
+		{
+			Vertex next = out.next();
+
+			next.removeOutAdjacency(v);
+		}
+
+		for (int i = 0; i < numArcs(); i++) {
+			if (arcs.get(i).getFrom().compareTo(v) == 0
+					|| arcs.get(i).getTo().compareTo(v) == 0) {
+				removeArc(arcs.get(i)); // Matching arc found
+			}
+		}
+
+		return data;
+	}
+
+	/*
+	 * Removes the given Arc and clears the two and from Vertex from each others
+	 * Respective adjacency lists
+	 */
+	public Object removeArc(Arc a) {
+		a.getFrom().removeOutAdjacency(a.getTo());
+		a.getTo().removeInAdjacency(a.getFrom());
+
+		return a.getData();
+	}
+
+	/*
+	 * Reverses the direction of the given Arc. Adjusts the to and from vertex
+	 * accordingly
+	 */
+	public void reverseDirection(Arc a, Arc b) {
+		Vertex temp;
+		temp = a.getFrom();
+
+		a.setFrom(b.getTo());
+		a.setTo(temp);
+
+		a.getFrom().setOutAdjacency(b.getTo());
+		a.getFrom().removeInAdjacency(b.getTo());
+		b.getTo().setInAdjacency(a.getFrom());
+		b.getTo().removeOutAdjacency(a.getFrom());
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// Annotations 
+
+	/*
+	 * Annotates the given Vertex with Object o indexed at the Object k
+	 */
+	public void setAnnotation(Vertex v, Object k, Object o) {
+		v.setAnnotation(k, o);
+	}
+
+	/*
+	 * Annotated the given Arc with Object o indexed at the Object k
+	 */
+	public void setAnnotation(Arc a, Object k, Object o) {
+		a.setAnnotation(k, o);
+	}
+
+	/*
+	 * Gets the annotation from the given Vertex indexed at the Object k
+	 */
+	public Object getAnnotation(Vertex v, Object k) {
+		return v.getAnnotation(k);
+	}
+
+	/*
+	 * Gets the annotation from the given Arc indexed at the Object k
+	 */
+	public Object getAnnotation(Arc a, Object k) {
+		return a.getAnnotation(k);
+	}
+
+	/*
+	 * Removes the annotation from the given Vertex indexed at the Object k
+	 */
+	public Object removeAnnotation(Vertex v, Object k) {
+		return v.removeAnnotation(k);
+	}
+
+	/*
+	 * Removes the annotation from the given Arc indexed at the Object k
+	 */
+	public Object removeAnnotation(Arc a, Object k) {
+		return a.removeAnnotation(k);
+	}
+
+	/*
+	 * Removes all annotations indexed at Object k from all Vertices and Arcs
+	 */
+	public void clearAnnotations(Object k) {
+		Iterator<Vertex> vertices = vertices();
+		Iterator<Arc> arcs = arcs();
+
+		while (vertices.hasNext()) {
+			vertices.next().removeAnnotation(k);
+		}
+		while (arcs.hasNext()) {
+			arcs.next().removeAnnotation(k);
+		}
+	}
+}
