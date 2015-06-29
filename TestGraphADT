@@ -1,0 +1,493 @@
+package ics311;
+
+/************************************************************************************
+ * 
+ * @author 	Original author 	Landon Soriano
+ *
+ *This is the driver class for ProjectTwo, will scan in VNA files using Scanner class. 
+ *Holds data within an ArrayList, computes the Strongly Connected Components which is 
+ *held in a Hashtable data structure. This Driver will compute total SCC's, the 
+ *percentage of verticies in Largest Strongly Connected Components. 
+ * 
+ ************************************************************************************/
+import java.util.*;
+import java.io.*;
+
+public class TestGraphADT 
+{
+	private static int time = 0;
+	private static int sccCount = 0;
+	private static LinkedList<Vertex> sort = new LinkedList<Vertex>();
+	private static Hashtable<Object, Object> StronglyConnectedComponents = new Hashtable<Object, Object>();
+	private static ArrayList<String> vertices = new ArrayList<String>();
+	private static ArrayList<String> arcs = new ArrayList<String>();
+	
+	public static void main(String[] args) 
+	{
+		String fileName = args[0];
+		File file = new File(fileName);
+		Scanner scan = null;
+		DirectedGraph graph = new DirectedGraph();
+		try //Open file
+		{
+			scan = new Scanner(file);
+		}
+		catch(FileNotFoundException e)
+		{
+			System.out.println("Error: Invalid file.");
+			System.exit(1);
+		}
+		long start = System.currentTimeMillis();
+		read(file, graph, scan);
+		
+		System.out.println("--------------------------------------------");
+		System.out.println("Graph " + fileName);
+		System.out.println("--------------------------------------------");
+		System.out.println("|V| = " + graph.numVertices());
+		System.out.println("|A| = " + graph.numArcs());
+		//denisty output
+		degreeDensity(graph);
+		//distribution 
+		degreeDistribution(graph);
+		sccTotal(graph);
+		System.out.println("Number of Strongly Connected Components:  " + sccCount);
+		
+		Iterator<Vertex> verts = graph.vertices();
+		
+		for(int i = 1; i < sccCount + 1; i++)
+		{
+			StronglyConnectedComponents.put(i, 0);
+		}
+		while(verts.hasNext())
+		{
+			Vertex next = verts.next();
+			int place = (Integer) next.getAnnotation("scc");
+			int oldNum = (Integer) StronglyConnectedComponents.get(place);
+			oldNum++;
+			StronglyConnectedComponents.put(place, oldNum);
+		}
+		
+		sccPrecentage(graph);
+		
+		
+		long end = System.currentTimeMillis();
+		long total = (end - start);
+		System.out.println("\nTest duration: " + total  + " Milliseconds");
+	}
+		/*
+		if(fileName.equals("SCC-Test.vna") || fileName.endsWith("Celegansneural.vna"))
+		{
+			System.out.println("\n");
+			computeSCC(graph);
+		}
+
+		
+	}
+	
+	*/
+
+	private static void read(File file, DirectedGraph graph, Scanner scan) 
+	{
+		int num = 1;
+		String next = scan.nextLine();
+		while(scan.hasNext())
+		{
+			if(num == 1)
+			{
+				next = scan.nextLine();
+				num = 2;
+			}
+			
+			// Reading vertex attributes line
+			
+			else if(num == 2)
+			{
+				if(next.contains(" "))
+				{
+					next = next.substring(next.indexOf(' '));
+					next = next.trim();
+					while(next.contains(" "))
+					{
+						String attr = next.substring(0, next.indexOf(' '));
+						next = next.substring(next.indexOf(' '));
+						next = next.trim();
+						vertices.add(attr);
+					}
+					vertices.add(next);
+				}
+				next = scan.nextLine();
+				num = 3;
+			}
+			//reading in vertices 
+			else if(num == 3)
+			{
+				if(vertices.size() > 0)
+				{
+					while(!next.contains("*"))
+					{
+						String vert = next.substring(0, next.indexOf(' '));
+						next = next.substring(next.indexOf(' '));
+						next = next.trim();
+						graph.insertVertex(vert);
+						for(int i = 0; i < vertices.size(); i++)
+						{
+							Vertex added = graph.getVertexData(vert);
+							if(next.contains(" "))
+							{
+								String attr = next.substring(0, next.indexOf(' '));
+								added.setAnnotation(vertices.get(i), attr);
+							}
+							else
+							{
+								added.setAnnotation(vertices.get(i), next);
+							}
+						}
+						next = scan.nextLine();
+					}
+					num = 4;
+				}
+				else
+				{
+					while(!next.contains("*"))
+					{
+						graph.insertVertex(next);
+						next = scan.nextLine();
+					}
+					num = 4;
+				}
+			}
+			//*tie data read in
+			else if(num == 4)
+			{
+				next = scan.nextLine();
+				num = 5;
+			}
+			else if(num == 5)
+			{
+				next = next.substring(next.indexOf(' '));
+				next = next.trim();
+				
+				if(next.contains(" "))
+				{
+					next = next.substring(next.indexOf(' '));
+					next = next.trim();
+					while(next.contains(" "))
+					{
+						String attr = next.substring(0, next.indexOf(' '));
+						next = next.substring(next.indexOf(' '));
+						next = next.trim();
+						arcs.add(attr);
+					}
+					arcs.add(next);
+					num = 6;
+					next = scan.nextLine();
+				}
+				else
+				{
+					next = scan.nextLine();
+					num = 6;
+				}
+			}
+			// Reading in arcs
+			else if(num == 6)
+			{
+				if(arcs.size() > 0)
+				{
+					while(!next.equals(""))
+					{
+						String to, from;
+						from = next.substring(0, next.indexOf(' '));
+						next = next.substring(next.indexOf(' '));
+						next = next.trim();
+						to = next.substring(0, next.indexOf(' '));
+						next = next.substring(next.indexOf(' '));
+						next  = next.trim();
+						Vertex vertTo = graph.getVertexData(to);
+						vertTo.addInDegree();
+						Vertex vertFrom = graph.getVertexData(from);
+						vertFrom.addOutDegree();
+						Arc added = graph.insertArc(vertFrom, vertTo);
+						
+						for(int i = 0; i < arcs.size(); i++)
+						{
+							if(next.contains(" "))
+							{
+								String attr = next.substring(0, next.indexOf(' '));
+								added.setAnnotation(arcs.get(i), attr);
+							}
+							else
+							{
+								added.setAnnotation(arcs.get(i), next);
+							}
+						}
+						
+						if(scan.hasNext())
+						{
+							next = scan.nextLine();
+						}
+						else
+						{
+							next = "";
+						}
+					}
+				}
+				else
+				{
+					while(!next.equals(""))
+					{
+						String to, from;
+						to = next.substring(0, next.indexOf(' '));
+						next = next.substring(next.indexOf(' '));
+						next = next.trim();
+						from = next;
+						Vertex vertTo = graph.getVertexData(to);
+						vertTo.addInDegree();
+						Vertex vertFrom = graph.getVertexData(from);
+						vertFrom.addOutDegree();
+						graph.insertArc(vertFrom, vertTo);
+						if(scan.hasNext())
+						{
+							next = scan.nextLine();
+						}
+						else
+						{
+							next = "";
+						}
+					}
+					num = 7;
+				}
+			}
+		}
+	}
+	
+	
+	/*
+	 * used to run through graph to find number of SCC. 
+	 * runtime = O(V + E), sizes = v , verts = e
+	 */
+	/*
+	private static void computeSCC(DirectedGraph graph) 
+	{
+		List<Integer> sizes = new ArrayList<Integer>();
+		for(int i = 0; i < sccCount; i++)
+		{
+			sizes.add((Integer)StronglyConnectedComponents.get(i + 1));
+		}
+		
+		System.out.println("SCC\tSize\tMembers");
+		for(int i = 0; i < sizes.size(); i++)
+		{
+			System.out.print(" " + (i + 1) + ".\t" + sizes.get(i) + "\t");
+			Iterator<Vertex> verts = graph.vertices();
+			while(verts.hasNext())
+			{
+				Vertex next = (Vertex)verts.next();
+				if((Integer)next.getAnnotation("scc") == i + 1)
+				{
+					System.out.print(next.getKey() + " ");
+				}
+			}
+			System.out.println();
+		}
+	}
+	
+	*/
+	
+	/*
+	 * used to find the percent of scc's within given graph 
+	 * runtime = O(n) due to search of hashtable = n in for loop.
+	 */
+	private static void sccPrecentage(DirectedGraph graph) 
+	{
+		double num = 0;
+		double percent;
+		
+		for(int i = 1; i <= sccCount; i++)
+		{
+			if((Integer)StronglyConnectedComponents.get(i) > num)
+			{
+				num = (Integer) StronglyConnectedComponents.get(i);
+			}
+		}
+		
+		System.out.print("Percent of Vertices in Largest Strongly Connected Component: ");
+		percent = (num / graph.numVertices() * 100.0);
+		System.out.println(String.format("%.3f", percent) + "%");
+	}
+
+	/*
+	 * will count number of scc's in graph, also if graph fits requirments used
+	 * to display members of scc. 
+	 * runtime O(e), iterate thru graph
+	 */
+	private static void sccTotal(DirectedGraph graph) 
+	{
+		depthFirstSearch(graph);
+		
+		Iterator<Arc> arcs = graph.arcs();
+		
+		while(arcs.hasNext()) //Compute graphs transpose
+		{
+			Arc next = arcs.next();
+			graph.reverseDirection(next, next);
+		}
+		
+		modDFS(graph, sort);
+	}
+
+	/*
+	 * counts through the dfs initially setting verts to "White" (begin) 
+	 * runtime = O(v + e)^2
+	 */
+	private static void modDFS(DirectedGraph graph, LinkedList<Vertex> list) 
+	{
+		for(int i = 0; i < list.size(); i++)
+		{
+			Vertex next = (Vertex) list.get(i);
+			next.setAnnotation("color", "WHITE");
+			next.setAnnotation("parent", "NULL");
+		
+		}
+		
+		time  = 0;
+		sccCount = 0;
+		
+		for(int i = 0; i < list.size(); i++)
+		{
+			Vertex next = (Vertex) list.get(i);
+
+			if(next.getAnnotation("color").equals("WHITE"))//when not visited
+			{
+				sccCount += 1;
+				DFSVisit(graph, next);
+		}
+			}
+	}
+
+	/*
+	 * depth first search algorithm used to compute scc's 
+	 * runtime = P(v^2)
+	 */
+	private static void depthFirstSearch(DirectedGraph graph) 
+	{
+		Iterator<Vertex> verts = graph.vertices();
+		
+		while(verts.hasNext())
+		{
+			Vertex next = (Vertex) verts.next();
+			next.setAnnotation("color", "WHITE");
+			next.setAnnotation("parent", "NULL");
+		}
+		
+		time  = 0;
+		sccCount = 0;
+		verts = graph.vertices();
+		
+		while(verts.hasNext())
+		{
+			Vertex next = (Vertex) verts.next();
+			if(next.getAnnotation("color").equals("WHITE"))
+			{
+				sccCount += 1;
+				//SCCs.put(scc, 0);
+				DFSVisit(graph, next); //Visit
+			}
+		}
+		
+	}
+
+	/*
+	 * marks nodes black when finished (if visited) 
+	 * runtime = O(v + e)
+	 */
+	private static void DFSVisit(DirectedGraph graph, Vertex next) 
+	{
+		time += 1;
+		next.setAnnotation("discovery", time);
+		next.setAnnotation("color", "GRAY");
+		next.setAnnotation("scc", sccCount);
+		
+		Iterator<Vertex> adj = next.getOutAdjacencies();
+		
+		while(adj.hasNext()) //Cycle through each adj vertex
+		{
+			Vertex neighbor = (Vertex) adj.next();
+			if(neighbor.getAnnotation("color").equals("WHITE")) 
+			{
+				neighbor.setAnnotation("parent", next);
+				DFSVisit(graph, neighbor); //Recurse
+			}
+		}
+		next.setAnnotation("color", "BLACK"); //finished
+		sort.addFirst(next);
+		time += 1;
+		next.setAnnotation("finish", time); 
+	}
+
+
+	/*
+	 * calculates degree denisty 
+	 * runtime = O(1), just calling data
+	 */
+	private static void degreeDensity(DirectedGraph graph)
+	{
+		double numArcs = graph.numArcs();
+		double possibleArcs = graph.numVertices() * (graph.numVertices() - 1);
+		double density = numArcs / possibleArcs;
+		System.out.println("Density: " + String.format("%.6f", density));
+	}
+
+	
+	/*
+	 * calculates various stats for graph (inDeg, outDeg, avgDeg) 
+	 * runtime = O(v)
+	 */
+	private static void degreeDistribution(DirectedGraph graph) 
+	{
+		int minIn = 0;
+		int maxIn = 0;
+		int minOut = 0;
+		int maxOut = 0;
+		long totalIn = 0;
+		long totalOut = 0;
+		double averageIn, averageOut;
+		double numVerts = graph.numVertices();
+		Iterator<Vertex> vertices = graph.vertices();
+		
+		while(vertices.hasNext()) //For each vertex
+		{
+			Vertex next = (Vertex) vertices.next();
+			
+			if(next.getInDegree() < minIn) //Check against minIn
+			{
+				minIn = next.getInDegree();
+			}
+			
+			if(next.getOutDegree() < minOut) //Check against minOut
+			{
+				minOut = next.getOutDegree();
+			}
+			
+			if(next.getInDegree() > maxIn) //Check against maxIn
+			{
+				maxIn = next.getInDegree();
+			}
+			
+			if(next.getOutDegree() > maxOut) //Check against maxOut
+			{
+				maxOut = next.getOutDegree();
+			}
+			
+			totalIn += next.getInDegree();
+			totalOut += next.getOutDegree();
+		}
+		
+		averageIn = totalIn / numVerts;
+		averageOut = totalOut / numVerts;
+		
+		System.out.println("Degree distribution:\tMinimum\tAverage\tMaximum");
+		System.out.println("  inDegree:\t\t" + minIn + "\t" + String.format("%.3f", averageIn) + "\t" + maxIn);
+		System.out.println("  outDegree:\t\t" + minOut + "\t" + String.format("%.3f", averageOut) + "\t" + maxOut);
+		
+	}
+}
