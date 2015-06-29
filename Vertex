@@ -1,0 +1,200 @@
+package ics311;
+
+import java.util.Hashtable;
+import java.util.LinkedList;
+
+/**************************************************************************
+ * 
+ * @author Original author Landon Soriano This class provides the implementation
+ *         for a vertex in a Graph ADT. Each Vertex has a key and (optional)
+ *         data, an inDegree and an outDegree, as well as an adjacency lists for
+ *         in- and out-adjacent vertices, and a Hashtable of annotations.
+ * 
+ *         Object key - The key to the vertex Object data - The data in the
+ *         vertex int inDegree - The in-degree of the vertex int outDegree - The
+ *         out-degree of the vertex Hashtable annotations - The annotations to
+ *         the Vertex LinkedList inAdjacency - The in-adjacency list for the
+ *         Vertex LinkedList outAdjacency - The out-adjacency list for the
+ *         Vertex
+ * 
+ **************************************************************************/
+public class Vertex implements Comparable<Vertex> {
+	private Object key;
+	private Object data;
+	private int inDegree;
+	private int outDegree;
+	private Hashtable<Object, Object> annotations;
+	private LinkedList<Vertex> inAdjacency;
+	private LinkedList<Vertex> outAdjacency;
+
+	/*
+	 * Default constructor. Key and data both set to null. In- and out-degree
+	 * are both set to 0. Annotations and both adjacency lists are initialized.
+	 */
+	public Vertex() {
+		key = null;
+		data = null;
+		inDegree = 0;
+		outDegree = 0;
+		annotations = new Hashtable<Object, Object>();
+		inAdjacency = new LinkedList<Vertex>();
+		outAdjacency = new LinkedList<Vertex>();
+	}
+
+	/*
+	 * Overloaded constructor. Key and data set to the values passed,
+	 * respectively. In- and out-degree are both set to 0. Annotations and both
+	 * adjacency lists are initialized.
+	 */
+	public Vertex(Object key, Object data) {
+		this.key = key;
+		this.data = data;
+		inDegree = 0;
+		outDegree = 0;
+		annotations = new Hashtable<Object, Object>();
+		inAdjacency = new LinkedList<Vertex>();
+		outAdjacency = new LinkedList<Vertex>();
+	}
+
+	/*
+	 * Returns an Iterator of the in-adjacent vertices of this vertex
+	 */
+	public java.util.Iterator<Vertex> getInAdjacencies() {
+		return inAdjacency.iterator();
+	}
+
+	/*
+	 * Adds the given Vertex to the in-adjacency list
+	 */
+	public void setInAdjacency(Vertex adj) {
+		inAdjacency.add(adj);
+	}
+
+	/*
+	 * Removes the given Vertex from this vertex's in-adjacency list
+	 */
+	public void removeInAdjacency(Vertex v) {
+		inAdjacency.remove(v);
+	}
+
+	/*
+	 * Returns an Iterator of the out-adjacent vertices of this Vertex
+	 */
+	public java.util.Iterator<Vertex> getOutAdjacencies() {
+		return outAdjacency.iterator();
+	}
+
+	/*
+	 * Adds the given Vertex to the out-adjacency list
+	 */
+	public void setOutAdjacency(Vertex adj) {
+		outAdjacency.add(adj);
+	}
+
+	/*
+	 * Removes the given Vertex from this vertex's out-adjacency list
+	 */
+	public void removeOutAdjacency(Vertex v) {
+		outAdjacency.remove(v);
+	}
+
+	/*
+	 * Returns the annotation with the given key
+	 */
+	public Object getAnnotation(Object key) {
+		return annotations.get(key);
+	}
+
+	/*
+	 * Annotates the Vertex with the given key and value
+	 */
+	public void setAnnotation(Object key, Object data) {
+		annotations.put(key, data);
+	}
+
+	/*
+	 * Removes, and returns, the annotation indexed at the key form the Vertex
+	 */
+	public Object removeAnnotation(Object key) {
+		return annotations.remove(key);
+	}
+
+	public Object getKey() {
+		return key;
+	}
+
+	public void setKey(Object key) {
+		this.key = key;
+	}
+
+	public Object getData() {
+		return data;
+	}
+
+	public void setData(Object data) {
+		this.data = data;
+	}
+
+	public int getInDegree() {
+		return inDegree;
+	}
+
+	public void setInDegree(int inDegree) {
+		this.inDegree = inDegree;
+	}
+
+	public int getOutDegree() {
+		return outDegree;
+	}
+
+	public void setOutDegree(int outDegree) {
+		this.outDegree = outDegree;
+	}
+
+	/*
+	 * Increases the in-degree of the vertex by one
+	 */
+	public void addInDegree() {
+		inDegree++;
+	}
+
+	/*
+	 * Decreases the in-degree of the vertex by one, as long as that does not
+	 * cause it to become negative
+	 */
+	public void subInDegree() {
+		if (inDegree > 0) {
+			inDegree--;
+		}
+	}
+
+	/*
+	 * Increases the out-degree of the vertex by one.
+	 */
+	public void addOutDegree() {
+		outDegree++;
+	}
+
+	/*
+	 * Decreases the out-degree of the vertex by one, as long as that does not
+	 * cause it to become negative
+	 */
+	public void subOutDegree() {
+		if (outDegree > 0) {
+			outDegree--;
+		}
+	}
+
+	/*
+	 * Compares two Vertices. Returns 0 if they are equal, 1 if they are not
+	 */
+	public int compareTo(Vertex o) {
+		int result;
+		if (this.key.equals(o)) {
+			result = 0;
+		} else {
+			result = 1;
+		}
+		return result;
+	}
+}
