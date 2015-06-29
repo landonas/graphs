@@ -1,0 +1,106 @@
+package ics311;
+
+import java.util.Hashtable;
+
+/********************************************************************
+ * 
+ * @author Original author Landon Soriano
+ * 
+ *         This class provides the implementation for an Arc (edge) in a
+ *         Directed Graph ADT
+ * 
+ *         Each arc has a data Object, a to and from Vertex, a weight and a
+ *         Hashtable of annotations
+ * 
+ *         Object data - The data stored in the arc Vertex to - The vertex the
+ *         arc goes to Vertex from - The vertex the arc comes from int weight -
+ *         The weight of the arc Hashtable annotations - The annotations to the
+ *         Arc
+ * 
+ *********************************************************************/
+
+public class Arc {
+	private Object data;
+	private Vertex to;
+	private Vertex from;
+	private int weight;
+	private Hashtable<Object, Object> annotations;
+
+	/*
+	 * Default constructor. Data, to and from all set to null. Weight is set to
+	 * 0. Annotations is initialized
+	 */
+	public Arc() {
+		setData(null);
+		setTo(null);
+		setFrom(null);
+		setWeight(0);
+		annotations = new Hashtable<Object, Object>();
+	}
+
+	/*
+	 * Overloaded constructor. Data, from and to set are set to passed values.
+	 * Weight is set to the weight passed. Annotations are
+	 * initialized
+	 */
+	public Arc(Object data, Vertex from, Vertex to, int weight) {
+		this.setData(data);
+		this.setTo(to);
+		this.setFrom(from);
+		this.setWeight(weight);
+		annotations = new Hashtable<Object, Object>();
+	}
+
+	public Object getData() {
+		return data;
+	}
+
+	public void setData(Object data) {
+		this.data = data;
+	}
+
+	public Vertex getTo() {
+		return to;
+	}
+
+	public void setTo(Vertex to) {
+		this.to = to;
+	}
+
+	public Vertex getFrom() {
+		return from;
+	}
+
+	public void setFrom(Vertex from) {
+		this.from = from;
+	}
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
+	/*
+	 * Sets the annotations with the given key and value
+	 */
+	public void setAnnotation(Object key, Object data) {
+		annotations.put(key, data);
+	}
+
+	/*
+	 * Returns the annotations with the given key
+	 */
+	public Object getAnnotation(Object key) {
+		return annotations.get(key);
+	}
+
+	/*
+	 * Removes, and returns, the annotation indexed at the key form the Arc
+	 */
+	public Object removeAnnotation(Object key) {
+		return annotations.remove(key);
+	}
+}
